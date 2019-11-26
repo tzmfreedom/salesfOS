@@ -1,8 +1,10 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+    <meta charset="utf-8"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+    <link rel="stylesheet" href="/app.css">
     <script src="https://riversun.github.io/jsframe/jsframe.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsforce/1.9.2/jsforce.min.js"></script>
@@ -10,100 +12,6 @@
             src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
-    <style>
-        .app-bottom-bar {
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            height: 40px;
-            background-color: #053046;
-        }
-
-        .app-bar_start {
-            padding-left: 10px;
-            height: 40px;
-            line-height: 40px;
-            color: white;
-            font-size: 20px;
-            background-color: transparent;
-            float: left;
-        }
-
-        .app-bar_start:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            width: 40px;
-            float: left;
-        }
-
-        .app-bar-icon {
-            float: right;
-            height: 40px;
-            line-height: 40px;
-            font-size: 18px;
-            color: white;
-        }
-
-        .app-bar_time {
-            height: 40px;
-            padding-right: 10px;
-            margin-left: 20px;
-            line-height: 20px;
-            color: white;
-            font-size: 13px;
-            float: left;
-        }
-
-        .date, .time {
-            height: 20px;
-        }
-
-        body {
-            width: 100%;
-            height: 100%;
-            background-image: url('wallpaper.jpg');
-        }
-
-        .app-icon-clicked {
-            opacity: 0.5;
-            border: dotted white 1px;
-        }
-
-        .folder {
-            position: absolute;
-            left: 20px;
-            top: 20px;
-            width: 66px;
-            height: 66px;
-        }
-
-        .game {
-            position: absolute;
-            left: 20px;
-            top: 100px;
-        }
-
-        .monitor {
-            position: absolute;
-            left: 20px;
-            top: 180px;
-        }
-
-        .cryptography {
-            position: absolute;
-            left: 20px;
-            top: 260px;
-        }
-
-        img {
-            width: 60px;
-            height: 60px;
-        }
-
-        .table {
-            font-size: 12px;
-        }
-    </style>
 </head>
 <body>
 <div id="folder" class="app-icon folder"><img src="folder.png" /></div>
@@ -124,61 +32,6 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-  jsforce.browser.init({
-    clientId: '3MVG9yZ.WNe6byQBYCaGTfGZBI242shnVTHgzqwWYLIsBR8CLxuYI1e7e3p3S48nyTgT3lvoCylIjvxjx7Pt.',
-    redirectUri: 'http://localhost:8000'
-  });
-  var connection;
-  if (jsforce.browser.connection && jsforce.browser.connection.instanceUrl !== '') {
-    connection = jsforce.browser.connection;
-  } else {
-    jsforce.browser.login();
-    jsforce.browser.on('connect', function(conn) {
-      connection = conn;
-    });
-  }
-  $('.app-bar_start').click(function() {
-    const jsFrame = new JSFrame();
-    connection.describeGlobal(function(err, res) {
-      if (err) { console.error(err); }
-      var body = res.sobjects.filter(function(sobject) {
-        return sobject.custom;
-      }).map(function(sobject) {
-        return `<tr><td>${sobject.label}</td><td>${sobject.name}</td></tr>`;
-      }).join('');
-      const html = '<table class="table" style="overflow: scroll;height: 500px;">' +
-        '<thead><tr><th>Name</th><th>Developer Name</th></tr></thead>' +
-        `<tbody>${body}</tbody>` +
-        '</table>';
-      const frame = jsFrame.create({
-        title: 'カスタムオブジェクト一覧',
-        appearanceName: 'redstone',
-        left: 20, top: 20, width: 620, height: 500,
-        movable: true,//マウスで移動可能
-        resizable: true,//マウスでリサイズ可能
-        html: html,
-      });
-      //ウィンドウを表示する
-      frame.show();
-    });
-  });
-
-  $('.app-icon').click(function() {
-    var id = $(this).attr('id');
-    $('.app-icon').each(function() {
-      if (id !== $(this).attr('id')) {
-        $(this).removeClass('app-icon-clicked');
-      } else {
-        $(this).addClass('app-icon-clicked');
-      }
-    });
-  });
-
-  setInterval(function() {
-    $('.date').text(moment().format('YYYY-MM-DD'));
-    $('.time').text(moment().format('HH:mm'));
-  }, 1000);
-</script>
+<script src="/app.js"></script>
 </body>
 </html>
