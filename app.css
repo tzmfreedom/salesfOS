@@ -82,6 +82,18 @@ body {
   top: 260px;
 }
 
+.pen {
+  position: absolute;
+  left: 20px;
+  top: 340px;
+}
+
+.trash {
+  position: absolute;
+  left: 20px;
+  top: 420px;
+}
+
 img {
   width: 60px;
   height: 60px;
@@ -89,4 +101,13 @@ img {
 
 .table {
   font-size: 12px;
+}
+
+.app-icon-name {
+  color: white;
+  position: absolute;
+  left: 0px;
+  top: 45px;
+  font-size: 12px;
+  width: 300px;
 }
