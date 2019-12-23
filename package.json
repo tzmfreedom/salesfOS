@@ -1,0 +1,32 @@
+{
+  "name": "salesfos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tzmfreedom/salesfOS.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tzmfreedom/salesfOS/issues"
+  },
+  "homepage": "https://github.com/tzmfreedom/salesfOS#readme",
+  "devDependencies": {
+    "@types/node": "^12.12.21",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.4"
+  },
+  "dependencies": {
+    "jsforce": "^1.9.3",
+    "moment": "^2.24.0",
+    "react": "^16.12.0"
+  }
+}
