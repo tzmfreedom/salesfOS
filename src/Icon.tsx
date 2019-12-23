@@ -8,7 +8,7 @@ interface Property {
 
 const Icon: React.FC<Property> = (props) => {
   return (
-    <div id={props.id} className="app-icon game">
+    <div id={props.id} className={'app-icon ' + props.id}>
       <div className="relative"><img src={props.img} />
         <span className="app-icon-name">{props.name}</span>
       </div>
