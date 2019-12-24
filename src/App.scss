@@ -56,6 +56,11 @@ body {
   border: dotted white 1px;
 }
 
+.dialog {
+  position: absolute;
+  border: 1px solid black;
+}
+
 .folder {
   position: absolute;
   width: 66px;

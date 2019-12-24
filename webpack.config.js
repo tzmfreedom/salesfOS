@@ -1,5 +1,10 @@
 const path = require('path');
-const HtmlWebPackPlugin = require("html-webpack-plugin");
+const HtmlWebPackPlugin = require('html-webpack-plugin');
+const {DefinePlugin} = require('webpack');
+const envKeys = Object.keys(process.env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(process.env[next]);
+  return prev;
+}, {});
 
 module.exports = {
   entry: './src/index.tsx',
@@ -53,6 +58,7 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: "./public/index.html",
       filename: "./index.html"
-    })
+    }),
+    new DefinePlugin(envKeys),
   ]
 }
