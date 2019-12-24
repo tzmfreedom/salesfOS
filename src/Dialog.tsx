@@ -15,6 +15,7 @@ const Dialog: React.FC<Property> = ({ children, style, id, name, onMouseDown, se
       className={'dialog' + (selected ? ' dialog-selected' : '')}
       onMouseDown={onMouseDown}
       >
+        <h1>{name}</h1>
       {children}
     </div>
   );
