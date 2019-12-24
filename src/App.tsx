@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Icon from './Icon';
 import './App.scss';
 import folderImg from './img/folder.png';
@@ -8,7 +8,7 @@ import cryptographyImg from './img/cryptography.png';
 import penImg from './img/pen.png';
 import trashImg from './img/trash.png';
 
-// const jsforce = require('jsforce');
+const jsforce = require('jsforce');
 
 // jsforce.browser.init({
 //   clientId: process.env.REACT_APP_SALESFORCE_CLIENT_ID,
@@ -81,11 +81,13 @@ const onDoubleClick = (e: React.KeyboardEvent<HTMLInputElement>) => {
 }
 
 const App: React.FC = () => {
-  const [icons, setIcons] = useState(defaultIcons)
+  const [iconConfig, setIconConfig] = useState({
+    icons: defaultIcons,
+    draggedIconId: '',
+  })
   const [selectedIconId, setSelectedIconId] = useState('game')
   const [oldX, setOldX] = useState(0)
   const [oldY, setOldY] = useState(0)
-  const [draggedIconId, setDraggedIconId] = useState('')
 
   const onMouseDown = (iconId: string) => {
     return (e: React.MouseEvent) => {
@@ -95,45 +97,62 @@ const App: React.FC = () => {
       // get the mouse cursor position at startup:
       setOldX(e.clientX);
       setOldY(e.clientY);
-      setDraggedIconId(iconId);
+      setIconConfig((prevState: any) => {
+        return {...prevState, draggedIconId: iconId}
+      });
     }
   }
 
-  document.onmouseup = draggedIconId === '' ? null : (e: MouseEvent) => {
-    if (draggedIconId !== 'trash' && isOnTrash(e)) {
-      delete icons[draggedIconId];
-      setIcons(icons);
-    }
-    setDraggedIconId('')
-  }
-
-  const isOnTrash = useCallback((e) => {
-    const trash = icons.trash;
+  const isOnTrash = (trash: any, e: any) => {
     return e.clientX >= trash.left &&
       e.clientX <= trash.left + 66 &&
       e.clientY >= trash.top &&
       e.clientY <= trash.top + 66;
-  }, [icons.trash])
-
-  document.onmousemove = draggedIconId === '' ? null : (e: MouseEvent) => {
-    e.preventDefault();
-    // calculate the new cursor position:
-    setOldX(e.clientX);
-    setOldY(e.clientY);
-
-    const icon = icons[draggedIconId]
-    // set the element's new position:
-    icon.top = (icon.top + e.clientY - oldY);
-    icon.left = (icon.left + e.clientX - oldX);
-    if (draggedIconId !== 'trash') {
-      if (isOnTrash(e)) {
-        icons.trash.style = { ...icons.trash.style, border: 'solid 1px red'};
-      } else {
-        icons.trash.style = { ...icons.trash.style, border: ''};
-      }
-    }
-    setIcons(icons)
   }
+
+  useEffect(() => {
+    const onmouseup = (e: MouseEvent) => {
+      setIconConfig((prevState: any) => {
+        if (prevState.draggedIconId !== 'trash' && isOnTrash(prevState.icons.trash, e)) {
+          delete prevState.icons[iconConfig.draggedIconId];
+          return { ...prevState, icons: prevState.icons, draggedIconId: '' }
+        }
+        return { ...prevState, draggedIconId: '' }
+      });
+    }
+    document.addEventListener('mouseup', onmouseup)
+    return () => document.removeEventListener('mouseup', onmouseup)
+  })
+
+  useEffect(() => {
+    const onmousemove = (e: MouseEvent) => {
+      e.preventDefault();
+      // calculate the new cursor position:
+      setOldX(e.clientX);
+      setOldY(e.clientY);
+      setIconConfig((prevState: any) => {
+        if (prevState.draggedIconId === '') {
+          return prevState
+        }
+        const icons = prevState.icons
+        const icon = icons[prevState.draggedIconId]
+        // set the element's new position:
+        icon.top = (icon.top + e.clientY - oldY);
+        icon.left = (icon.left + e.clientX - oldX);
+        if (prevState.draggedIconId !== 'trash') {
+          if (isOnTrash(prevState.icons.trash, e)) {
+            icons.trash.style = { ...icons.trash.style, border: 'solid 1px red' };
+          } else {
+            icons.trash.style = { ...icons.trash.style, border: '' };
+          }
+        }
+        return {...prevState, icons: prevState.icons}
+      })
+    }
+    document.addEventListener('mousemove', onmousemove)
+    return () => document.removeEventListener('mousemove', onmousemove)
+  })
+  const icons = iconConfig.icons
   return (
     <div className="App">
       {Object.keys(icons).map((iconId) => {
