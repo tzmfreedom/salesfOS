@@ -147,8 +147,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     jsforce.browser.init({
-      clientId: process.env.SALESFORCE_CLIENT_ID,
-      redirectUri: process.env.SALESFORCE_REDIRECT_URI,
+      clientId: process.env.client_id,
+      redirectUri: process.env.redirect_uri,
       proxyUrl: 'https://tzmfreedom-jsforce-proxy.herokuapp.com/proxy/'
     });
 
