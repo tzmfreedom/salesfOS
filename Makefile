@@ -4,14 +4,15 @@ SALESFORCE_REDIRECT_URI := "https://tzmfreedom.github.io/salesfOS/"
 
 .PHONY: build
 build:
-	npm run build
+	npx webpack --mode production
 
 .PHONY: start
+start: $(eval SALESFORCE_REDIRECT_URI=$(SALESFORCE_REDIRECT_URI_DEV))
 start:
-	npm run start
+	npx webpack-dev-server --open --mode development
 
 .PHONY: deploy
 deploy:
-	$(MAKE) build 
+	$(MAKE) build
 	npx gh-pages -d dist
 
