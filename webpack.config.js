@@ -4,7 +4,7 @@ const {DefinePlugin} = require('webpack');
 const envKeys = Object.keys(process.env)
   .filter(key => /^SALESFORCE_/.test(key))
   .reduce((prev, next) => {
-    prev[`process.env.${next}`] = process.env[next];
+    prev[`process.env.${next}`] = JSON.stringify(process.env[next]);
     return prev;
   }, {});
 

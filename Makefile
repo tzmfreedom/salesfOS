@@ -1,6 +1,6 @@
-SALESFORCE_CLIENT_ID := "3MVG9yZ.WNe6byQBYCaGTfGZBI242shnVTHgzqwWYLIsBR8CLxuYI1e7e3p3S48nyTgT3lvoCylIjvxjx7Pt."
-SALESFORCE_REDIRECT_URI_DEV := "http://localhost:8080"
-SALESFORCE_REDIRECT_URI := "https://tzmfreedom.github.io/salesfOS/"
+SALESFORCE_CLIENT_ID := 3MVG9yZ.WNe6byQBYCaGTfGZBI242shnVTHgzqwWYLIsBR8CLxuYI1e7e3p3S48nyTgT3lvoCylIjvxjx7Pt.
+SALESFORCE_REDIRECT_URI_DEV := http://localhost:8080
+SALESFORCE_REDIRECT_URI := https://tzmfreedom.github.io/salesfOS/
 
 .PHONY: build
 build:
