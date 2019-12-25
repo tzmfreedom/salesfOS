@@ -15,6 +15,7 @@ import { faWifi, faVolumeUp, faBatteryThreeQuarters, faCloud } from '@fortawesom
 const jsforce = require('jsforce');
 
 let incrementalIndex = 10
+let connection: any;
 
 interface IconProperty {
   img: any
@@ -46,7 +47,7 @@ const defaultIcons: {[s: string]: IconProperty} = {
     },
     selected: true,
     type: 'window',
-    body: () => <AccountList />
+    body: () => <AccountList connection={connection} />
   },
   game: {
     img: gameImg,
@@ -79,7 +80,7 @@ const defaultIcons: {[s: string]: IconProperty} = {
     },
     selected: false,
     type: 'window',
-    body: () => <AccountList />
+    body: () => <AccountList connection={connection} />
   },
   pen: {
     img: penImg,
@@ -102,7 +103,7 @@ const defaultIcons: {[s: string]: IconProperty} = {
     },
     selected: false,
     type: 'window',
-    body: () => <AccountList />
+    body: () => <AccountList connection={connection}/>
   },
 };
 
@@ -148,7 +149,12 @@ const App: React.FC = () => {
     jsforce.browser.init({
       clientId: process.env.SALESFORCE_CLIENT_ID,
       redirectUri: process.env.SALESFORCE_REDIRECT_URI,
+      proxyUrl: 'https://tzmfreedom-jsforce-proxy.herokuapp.com/proxy/'
     });
+
+    jsforce.browser.on('connect', function(conn: any) {
+      connection = conn
+    })
 
     const onmouseup = (e: MouseEvent) => {
       setIconConfig((prevState: IconConfig) => {

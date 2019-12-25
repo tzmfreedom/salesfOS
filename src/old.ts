@@ -26,10 +26,6 @@ jsforce.browser.on('connect', function(conn: any) {
   connection = conn;
 });
 
-// $('.app-bar_start').click(function() {
-//   jsforce.browser.login();
-// });
-
 // function showDescribeWindow() {
 //   connection.describeGlobal(function(err, res) {
 //     if (err) { console.error(err); }

@@ -4,5 +4,8 @@ $ npm i -D \
   html-loader sass-loader node-sass style-loader css-loader \
   react react-dom \
   file-loader url-loader \
+  gh-pages \
+  @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/react-fonta \
+  react-fontawesome @fortawesome/free-solid-svg-icons \
   @types/{react,react-dom,node}
 ```
