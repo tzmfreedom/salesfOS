@@ -3,6 +3,8 @@ SALESFORCE_REDIRECT_URI_DEV := http://localhost:8080
 SALESFORCE_REDIRECT_URI := https://tzmfreedom.github.io/salesfOS/
 
 .PHONY: build
+build: $(eval SALESFORCE_CLIENT_ID=$(SALESFORCE_CLIENT_ID))
+build: $(eval SALESFORCE_REDIRECT_URI=$(SALESFORCE_REDIRECT_URI))
 build:
 	npx webpack --mode production
 
@@ -12,7 +14,6 @@ start:
 	npx webpack-dev-server --open --mode development
 
 .PHONY: deploy
-deploy:
-	$(MAKE) build
+deploy: build
 	npx gh-pages -d dist
 

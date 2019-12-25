@@ -8,8 +8,6 @@ const envKeys = Object.keys(process.env)
     return prev;
   }, {});
 
-console.log(envKeys);
-
 module.exports = {
   entry: './src/index.tsx',
   output: {
