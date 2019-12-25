@@ -149,7 +149,7 @@ const App: React.FC = () => {
     jsforce.browser.init({
       clientId: process.env.client_id,
       redirectUri: process.env.redirect_uri,
-      proxyUrl: 'https://tzmfreedom-jsforce-proxy.herokuapp.com/proxy/'
+      proxyUrl: process.env.proxy_url,
     });
 
     jsforce.browser.on('connect', function(conn: any) {
