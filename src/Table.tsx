@@ -7,7 +7,7 @@ interface TableProperty {
 
 const Table: React.FC<TableProperty> = ({ fields, records }) => {
   return (
-    <table>
+    <table className="table-header-fixed">
       <thead>
       <tr>
         {fields.map(field => {

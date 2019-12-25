@@ -18,9 +18,7 @@ const AccountList: React.FC<AccountListProperty> = ({ children, connection }) =>
     })
   }, [])
   return (
-    <div>
-      <Table records={records} fields={fields}/>
-    </div>
+    <Table records={records} fields={fields} />
   );
 }
 
