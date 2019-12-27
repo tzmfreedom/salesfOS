@@ -140,7 +140,34 @@ const App: React.FC = () => {
     })
   }, [])
 
+  const onClose = useCallback((dialogId: string) => {
+    const dialogs = iconConfig.dialogs;
+    delete dialogs[dialogId]
+    setIconConfig(prevState => {
+      return {...prevState, dialogs}
+    })
+  }, [iconConfig.dialogs])
+  
+  const onMinimize = useCallback((dialogId: string) => {
+    const dialogs = iconConfig.dialogs;
+    dialogs[dialogId].hidden = true;
+    console.log(dialogs[dialogId])
+    setIconConfig(prevState => {
+      return {...prevState, dialogs}
+    })
+  }, [iconConfig.dialogs])
+
   const doubleClick = useCallback((icon) => {
+    if (icon.name === 'ゴミ箱') {
+      setIconConfig((prevState: IconConfig) => {
+        Object.keys(prevState.dialogs).forEach(key => {
+          prevState.dialogs[key].hidden = false;
+        })
+        console.log({...prevState, dialogs: prevState.dialogs})
+        return {...prevState, dialogs: prevState.dialogs}
+      })
+      return;
+    }
     switch (icon.type) {
       case 'link':
         window.open(icon.link, '_blank')
@@ -148,12 +175,12 @@ const App: React.FC = () => {
       case 'window':
       default:
         setIconConfig((prevState: IconConfig) => {
-          const id = Object.keys(prevState.dialogs).length
           incrementalIndex++
+          console.log(incrementalIndex);
           const dialogs = {
             ...prevState.dialogs,
-            [id]: {
-              id,
+            [incrementalIndex]: {
+              id: incrementalIndex,
               name: icon.name,
               left: incrementalIndex * 10,
               top: incrementalIndex * 10,
@@ -197,9 +224,9 @@ const App: React.FC = () => {
           height={dialog.height}
           width={dialog.width}
           style={dialog.style}
-          onClose={() => {}}
-          onMaximize={() => {}}
-          onMinimize={() => {}}
+          hidden={dialog.hidden}
+          onClose={onClose}
+          onMinimize={onMinimize}
           >{dialog.children}</Dialog>
       })}
       <div className="app-bottom-bar">

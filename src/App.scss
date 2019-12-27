@@ -163,6 +163,78 @@ table.flex-table tr th {
   background-color: red;
 }
 
+.title-bar {
+  cursor: default;
+}
+
+.icons {
+  display: inline-block;
+}
+
+.dialog-icon {
+  position: relative;
+}
+
+@mixin dialog-icon {
+    content: "";
+    position: absolute;
+    display: inline-block;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+}
+
+.hover {
+  .dialog-close:before{
+    @include dialog-icon;
+    top: 2px;
+    left: 5px;
+    width: 1px;
+    height: 8px;
+    -moz-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+  .dialog-close:after{
+    @include dialog-icon;
+    top: 2px;
+    left: 5px;
+    width: 1px;
+    height: 8px;
+    background-color: black;
+    -moz-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  .dialog-min:before{
+    @include dialog-icon;
+    top: 5px;
+    left: 2px;
+    width: 8px;
+    height: 1px;
+  }
+  .dialog-max:before{
+    @include dialog-icon;
+    top: 3px;
+    left: 3px;
+    width: 6px;
+    height: 6px;
+  }
+  .dialog-max:after{
+    @include dialog-icon;
+    top: 5px;
+    left: 2px;
+    width: 1px;
+    height: 8px;
+    background-color: yellowgreen;
+    -moz-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+}
+
+
 .dialog-min {
   @include dialog-title-button();
   background-color: yellow;

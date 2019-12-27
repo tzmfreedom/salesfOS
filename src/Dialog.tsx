@@ -8,9 +8,9 @@ interface Property {
   left: number
   width: number
   height: number
-  onClose: (e: React.MouseEvent) => void
-  onMinimize: (e: React.MouseEvent) => void
-  onMaximize: (e: React.MouseEvent) => void
+  hidden?: boolean
+  onClose: (dialogId: string) => void
+  onMinimize: (dialogId: string) => void
 }
 
 let incrementIndex = 10;
@@ -22,23 +22,61 @@ const reducer = (state: any, action: any) => {
         ...state,
         x: action.x,
         y: action.y,
-        selected: true,
+        dragging: true,
         zIndex: incrementIndex++
       }
-    case 'drag_dialog':
-      if (!state.selected) return state;
+    case 'drag':
+      if (state.dragging) {
+        return {
+          ...state,
+          x: action.x,
+          y: action.y,
+          top: state.top + action.y - state.y,
+          left: state.left + action.x - state.x,
+        }
+      }
+      if (state.resizing) {
+        return {
+          ...state,
+          width: action.x - state.left,
+          height: action.y - state.top,
+        }
+      }
+      return state;
+    case 'resize_start':
       return {
         ...state,
         x: action.x,
         y: action.y,
-        top: state.top + action.y - state.y,
-        left: state.left + action.x - state.x,
+        resizing: true,
+        zIndex: incrementIndex++
       }
     case 'mouseup':
-      if (!state.selected) return state;
+      if (!state.dragging && !state.resizing) return state;
       return {
         ...state,
-        selected: false,
+        dragging: false,
+        resizing: false,
+      }
+    case 'hover':
+      return {
+        ...state,
+        icon: {
+          hover: action.state,
+        },
+      }
+    case 'show_top':
+      return {
+        ...state,
+        zIndex: incrementIndex++
+      }
+    case 'maximize':
+      return {
+        ...state,
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
       }
     default:
       console.log(action);
@@ -46,7 +84,7 @@ const reducer = (state: any, action: any) => {
   }
 }
 
-const Dialog: React.FC<Property> = ({ children, style, id, name, top, left, width, height, onClose, onMinimize, onMaximize }) => {
+const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, left, width, height, onClose, onMinimize}) => {
   const [state, dispatch] = useReducer(reducer, {
     mouse: { x: 0, y: 0 },
     top,
@@ -55,16 +93,15 @@ const Dialog: React.FC<Property> = ({ children, style, id, name, top, left, widt
     height,
     zIndex: incrementIndex,
     selected: false,
+    icon: {
+      hover: false,
+    },
   })
-  // const onResizeMouseDown = (e: React.MouseEvent) => {
-  //   setIsResize(true)
-  //   setMouse({x: e.clientX, y: e.clientY})
-  // }
   useEffect(() => {
     const onmousemove = (e: MouseEvent) => {
       e.preventDefault();
       dispatch({
-        type: 'drag_dialog',
+        type: 'drag',
         x: e.clientX,
         y: e.clientY,
       })
@@ -74,32 +111,52 @@ const Dialog: React.FC<Property> = ({ children, style, id, name, top, left, widt
       document.removeEventListener('mousemove', onmousemove)
     }
   }, [])
+  const showTop = useCallback((e: React.MouseEvent) => {
+    dispatch({type: 'show_top'})
+  }, []);
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     dispatch({type: 'drag_start', x: e.clientX, y: e.clientY})
   }, [])
-  // const onResizeMouseUp = (e: React.MouseEvent) => {
-  //   setIsResize(false)
-  // }
+  const onResizeMouseDown = useCallback((e: React.MouseEvent) => {
+    dispatch({type: 'resize_start', x: e.clientX, y: e.clientY})
+  }, [])
   const onMouseUp = useCallback((e: React.MouseEvent) => {
     dispatch({type: 'mouseup'})
   }, [])
-
+  const onMouseEnter = useCallback((e: React.MouseEvent) => {
+    dispatch({type: 'hover', state: true})
+  }, [])
+  const onMouseLeave = useCallback((e: React.MouseEvent) => {
+    dispatch({type: 'hover', state: false})
+  }, [])
+  const onDialogClose = useCallback((e: React.MouseEvent) => {
+    onClose(id);
+  }, [onClose])
+  const onMaximize = useCallback((e: React.MouseEvent) => {
+    dispatch({type: "maximize"});
+  }, [])
+  const onDialogMinimize = useCallback((e: React.MouseEvent) => {
+    onMinimize(id)
+  }, [onMinimize])
   return (
     <div id={id} 
-      style={{...style, left: state.left, top: state.top, width: state.width, height: state.height, zIndex: state.zIndex}}
-      className={'dialog' + (state.selected ? ' dialog-selected' : '')}
+      style={{...style, display: (hidden ? 'none' : 'block'), left: state.left, top: state.top, width: state.width, height: state.height, zIndex: state.zIndex}}
+      className={'dialog' + (state.dragging ? ' dialog-selected' : '')}
+      onClick={showTop}
       >
-      <div className="title-bar" onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
-        <div className="dialog-close" onClick={onClose}></div>
-        <div className="dialog-min" onClick={onMinimize}></div>
-        <div className="dialog-max" onClick={onMaximize}></div>
+      <div className={'title-bar' + (state.icon.hover ? ' hover' : '')} onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
+        <div className="icons" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+          <div className="dialog-close dialog-icon" onClick={onDialogClose}></div>
+          <div className="dialog-min dialog-icon" onClick={onDialogMinimize}></div>
+          <div className="dialog-max dialog-icon" onClick={onMaximize}></div>
+        </div>
         <div className="title" >{name}</div>
       </div>
       <div className="dialog-content">
       {children}
       </div>
-      <div onMouseDown={() => {}} onMouseUp={() => {}} style={{position: "absolute", bottom: 0, right: 0}}>//</div>
+      <div onMouseDown={onResizeMouseDown} onMouseUp={onMouseUp} style={{position: "absolute", bottom: 0, right: 0}}>//</div>
     </div>
   );
 }
