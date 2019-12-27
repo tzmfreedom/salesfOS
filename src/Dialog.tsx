@@ -73,10 +73,7 @@ const reducer = (state: any, action: any) => {
     case 'maximize':
       return {
         ...state,
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
+        max: !state.max,
       }
     default:
       console.log(action);
@@ -93,6 +90,7 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
     height,
     zIndex: incrementIndex,
     selected: false,
+    max: false,
     icon: {
       hover: false,
     },
@@ -141,8 +139,16 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
   }, [onMinimize])
   return (
     <div id={id} 
-      style={{...style, display: (hidden ? 'none' : 'block'), left: state.left, top: state.top, width: state.width, height: state.height, zIndex: state.zIndex}}
-      className={'dialog' + (state.dragging ? ' dialog-selected' : '')}
+      style={{
+        ...style,
+        // display: (hidden ? 'none' : 'block'),
+        left: state.max ? 0 : state.left,
+        top: state.max ? 0 : state.top,
+        width: state.max ? '100%' : state.width,
+        height: state.max ? '100%' : state.height,
+        zIndex: state.zIndex,
+      }}
+      className={'dialog' + (state.dragging ? ' dialog-selected' : '') + (hidden ? ' hidden' : '')}
       onClick={showTop}
       >
       <div className={'title-bar' + (state.icon.hover ? ' hover' : '')} onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
@@ -156,7 +162,7 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
       <div className="dialog-content">
       {children}
       </div>
-      <div onMouseDown={onResizeMouseDown} onMouseUp={onMouseUp} style={{position: "absolute", bottom: 0, right: 0}}>//</div>
+      <div onMouseDown={onResizeMouseDown} onMouseUp={onMouseUp} style={{cursor: 'nwse-resize', position: "absolute", bottom: 0, right: 0}}>//</div>
     </div>
   );
 }

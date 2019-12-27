@@ -164,11 +164,17 @@ table.flex-table tr th {
 }
 
 .title-bar {
-  cursor: default;
+  cursor: move;
 }
 
 .icons {
   display: inline-block;
+  cursor: default;
+}
+
+.hidden {
+  transform: translate(-100%, 100%) scale(0);
+  transition: 100ms;
 }
 
 .dialog-icon {

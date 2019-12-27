@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import Icon from './Icon';
 import Dialog from './Dialog';
 import AccountList from './AccountList';
+import SObjectList from './SObjectList';
 import './App.scss';
 import folderImg from './img/folder.png';
 import gameImg from './img/game.png';
@@ -80,7 +81,7 @@ const defaultIcons: {[s: string]: IconProperty} = {
     },
     selected: false,
     type: 'window',
-    body: () => <AccountList connection={connection} />
+    body: () => <SObjectList connection={connection} />
   },
   pen: {
     img: penImg,
@@ -151,7 +152,6 @@ const App: React.FC = () => {
   const onMinimize = useCallback((dialogId: string) => {
     const dialogs = iconConfig.dialogs;
     dialogs[dialogId].hidden = true;
-    console.log(dialogs[dialogId])
     setIconConfig(prevState => {
       return {...prevState, dialogs}
     })
@@ -197,6 +197,18 @@ const App: React.FC = () => {
         break;
     }
   }, [])
+  const activateWindow = useCallback((dialogId: string) => {
+    return (e: React.MouseEvent) => {
+      setIconConfig(prevState => {
+        const dialog = prevState.dialogs[dialogId];
+        dialog.hidden = false;
+        return {
+          ...prevState,
+          dialogs: prevState.dialogs,
+        }
+      })
+    }
+  }, []);
   const { icons, dialogs } = iconConfig
   return (
     <div className="App">
@@ -232,6 +244,27 @@ const App: React.FC = () => {
       <div className="app-bottom-bar">
         <div className="app-bar_start">
           <FontAwesomeIcon icon={faCloud} onClick={appStart}/>
+        </div>
+        <div className="task-bar" style={{
+          marginLeft: '20px',
+          float: 'left',
+        }}>
+          {Object.keys(dialogs).map((dialogId) => {
+            const dialog = dialogs[dialogId]
+            return <div
+              style={{
+                float: 'left',
+                color: 'white',
+                lineHeight: '40px',
+                padding: '0 10px',
+                borderLeft: '1px solid white',
+                borderRight: '1px solid white',
+                cursor: 'default',
+              }}
+              key={dialogId}
+              onClick={activateWindow(dialogId)}
+            >{dialog.name}</div>
+          })}
         </div>
         <div className="app-bar-icon">
           <div style={{float: "left"}}>
