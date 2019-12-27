@@ -7,20 +7,20 @@ interface TableProperty {
 
 const Table: React.FC<TableProperty> = ({ fields, records }) => {
   return (
-    <table className="table-header-fixed">
+    <table className="flex-table">
       <thead>
       <tr>
         {fields.map(field => {
-          return <th>{field}</th>
+          return <th key={field}>{field}</th>
         })}
       </tr>
       </thead>
       <tbody>
         {records.map(record => {
           return (
-            <tr>
+            <tr key={record.Id}>
               {fields.map(field => (
-                <td>{record[field]}</td>
+                <td key={`${record.Id}-${field}`}>{record[field]}</td>
               ))}
             </tr>
           )

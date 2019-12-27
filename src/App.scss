@@ -100,68 +100,32 @@ img {
   width: 300px;
 }
 
-@mixin dialog-title-button {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-left: 5px;
-  display: inline-block;
-}
-
-.table-header-fixed {
-  width: 60%;
-  min-width: calc(40em + 17px); /* カラム最小幅合計値+スクロールバーの幅+1px（誤差吸収用） */
+table.flex-table {
+  display: flex;
+  flex-direction: column;
   height: calc(100% - 30px);
-  overflow-y: scroll;
-  border-collapse: collapse;
 }
-
-.table-header-fixed thead,
-.table-header-fixed tbody,
-.table-header-fixed tr,
-.table-header-fixed th,
-.table-header-fixed td {
-      display: block;
-}
-
-.table-header-fixed thead {
-  width: calc(100% - 16px); /* 100% - スクロールバーの幅 */
-}
-
-.table-header-fixed tbody {
-  height: calc(100% - 2em); /* 100% - ヘッダの高さ */
-  overflow-y: scroll;
-}
-
-.table-header-fixed tr:after { /* clearfix */
-  content: "";
-  clear: both;
+table.flex-table thead,
+table.flex-table tbody {
   display: block;
 }
-
-.table-header-fixed th,
-.table-header-fixed td {
-  float: left;
-  height: 2em;
-  line-height: 2em;
-  overflow: hidden;
-  padding: 0 calc((100% - 40em)/6); /* (100% - カラム最小幅合計値)/(カラム数*2) */
-  border-bottom: 1px solid #CCC;
-  box-sizing: content-box;
+table.flex-table thead {
+  margin-right: 0px;
 }
-
-.table-header-fixed th:first-child,
-.table-header-fixed td:first-child{
-  width: 10em;    /* カラム1の最小幅 */
-  text-align: right;
+table.flex-table tbody {
+  flex: 1;
+  overflow-y: scroll;
 }
-.table-header-fixed th:nth-child(2),
-.table-header-fixed td:nth-child(2){
-  width: 10em;    /* カラム2の最小幅 */
+table.flex-table tr {
+  width: 100%;
+  display: flex;
 }
-.table-header-fixed th:nth-child(3),
-.table-header-fixed td:nth-child(3){
-  width: 20em;    /* カラム3の最小幅 */
+table.flex-table tr td,
+table.flex-table tr th {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: left;
 }
 
 .dialog {
@@ -172,11 +136,26 @@ img {
 
 .dialog-content {
   height: 100%;
+  padding: 10px;
 }
 
 .title-bar {
   cursor: grab;
   border-bottom: 1px solid #ddd;
+}
+
+@mixin dialog-title-button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 5px;
+  display: inline-block;
+}
+
+.title {
+  text-align: center;
+  margin-left: 300px;
+  display: inline-block;
 }
 
 .dialog-close {

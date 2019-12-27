@@ -13,6 +13,7 @@ module.exports = env => {
       path: __dirname + "/dist",
       filename: "bundle.js"
     },
+    devtool: 'inline-source-map',
     devServer: {
       contentBase: "./dist"
     },

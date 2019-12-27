@@ -14,7 +14,7 @@ import { faWifi, faVolumeUp, faBatteryThreeQuarters, faCloud } from '@fortawesom
 
 const jsforce = require('jsforce');
 
-let incrementalIndex = 10
+let incrementalIndex = 10;
 let connection: any;
 
 interface IconProperty {
@@ -120,23 +120,6 @@ const App: React.FC = () => {
       y: 0,
     }
   } as IconConfig)
-  const [selectedIconId, setSelectedIconId] = useState('game')
-  const [selectedDialogId, setSelectedDialogId] = useState('')
-
-  const onMouseDown = (iconId: string) => {
-    return (e: React.MouseEvent) => {
-      e.preventDefault();
-      // e.persist()
-      const x = e.clientX
-      const y = e.clientY
-
-      setSelectedIconId(iconId)
-      // get the mouse cursor position at startup:
-      setIconConfig((prevState: IconConfig) => {
-        return {...prevState, mouse: { x, y}, draggedIconId: iconId}
-      });
-    }
-  }
 
   const isOnTrash = useCallback((trash: IconProperty, e: MouseEvent) => {
     return e.clientX >= trash.left &&
@@ -155,69 +138,7 @@ const App: React.FC = () => {
     jsforce.browser.on('connect', function(conn: any) {
       connection = conn
     })
-
-    const onmouseup = (e: MouseEvent) => {
-      setIconConfig((prevState: IconConfig) => {
-        if (prevState.draggedIconId !== 'trash' && isOnTrash(prevState.icons.trash, e)) {
-          delete prevState.icons[iconConfig.draggedIconId];
-          return { ...prevState, icons: prevState.icons, draggedIconId: '' }
-        }
-        return { ...prevState, draggedIconId: '', draggedDialogId: '' }
-      });
-    }
-    
-    const onmousemove = (e: MouseEvent) => {
-      e.preventDefault();
-      // calculate the new cursor position:
-      setIconConfig((prevState: IconConfig) => {
-        const { mouse: {x, y}, icons, dialogs } = prevState
-        if (prevState.draggedIconId !== '') {
-          const icon = icons[prevState.draggedIconId]
-          // set the element's new position:
-          icon.top = (icon.top + e.clientY - y);
-          icon.left = (icon.left + e.clientX - x);
-          if (prevState.draggedIconId !== 'trash') {
-            if (isOnTrash(prevState.icons.trash, e)) {
-              icons.trash.style = { ...icons.trash.style, border: 'solid 1px red' };
-            } else {
-              icons.trash.style = { ...icons.trash.style, border: '' };
-            }
-          }
-          return {...prevState, mouse: {x: e.clientX, y: e.clientY}, icons: prevState.icons}
-        } else if (prevState.draggedDialogId !== '') {
-          const dialog = dialogs[prevState.draggedDialogId]
-          // set the element's new position:
-          dialog.top = (dialog.top + e.clientY - y);
-          dialog.left = (dialog.left + e.clientX - x);
-          return {...prevState, mouse: {x: e.clientX, y: e.clientY}, dialogs: prevState.dialogs}
-        }
-        return prevState
-      })
-    }
-    document.addEventListener('mouseup', onmouseup)
-    document.addEventListener('mousemove', onmousemove)
-    return () => {
-      document.removeEventListener('mouseup', onmouseup)
-      document.removeEventListener('mousemove', onmousemove)
-    }
   }, [])
-
-  const onDialogMouseDown = useCallback((dialogId: string) => {
-    return (e: React.MouseEvent) => {
-      e.preventDefault();
-      const x = e.clientX
-      const y = e.clientY
-
-      setSelectedDialogId(dialogId);
-      // get the mouse cursor position at startup:
-      setIconConfig((prevState: IconConfig) => {
-        const dialog = prevState.dialogs[dialogId]
-        dialog.style.zIndex = ++incrementalIndex
-        return {...prevState, mouse: {x, y}, dialogs: prevState.dialogs, draggedDialogId: dialogId}
-      });
-    }
-  }, [])
-
 
   const doubleClick = useCallback((icon) => {
     switch (icon.type) {
@@ -228,6 +149,7 @@ const App: React.FC = () => {
       default:
         setIconConfig((prevState: IconConfig) => {
           const id = Object.keys(prevState.dialogs).length
+          incrementalIndex++
           const dialogs = {
             ...prevState.dialogs,
             [id]: {
@@ -235,8 +157,10 @@ const App: React.FC = () => {
               name: icon.name,
               left: incrementalIndex * 10,
               top: incrementalIndex * 10,
+              width: '800px',
+              height: '300px',
               style: {
-                zIndex: ++incrementalIndex,
+                backgroundColor: 'white',
               },
               children: icon.body(),
             }
@@ -251,19 +175,31 @@ const App: React.FC = () => {
     <div className="App">
       {Object.keys(icons).map((iconId) => {
         const icon = icons[iconId]
-        return <Icon key={iconId} id={iconId} img={icon.img} name={icon.name}
-          style={{left: `${icon.left}px`, top: `${icon.top}px`, ...icon.style}}
-          selected={selectedIconId === iconId}
-          onMouseDown={onMouseDown(iconId)}
+        return <Icon 
+          key={iconId} 
+          id={iconId}
+          img={icon.img}
+          name={icon.name}
+          top={icon.top}
+          left={icon.left}
+          style={icon.style}
           onDoubleClick={() => {doubleClick(icon)}}
           />
       })}
       {Object.keys(dialogs).map((dialogId) => {
         const dialog = dialogs[dialogId]
-        return <Dialog key={dialogId} id={dialogId} name={dialog.name}
-          style={{left: `${dialog.left}px`, top: `${dialog.top}px`, ...dialog.style}}
-          onMouseDown={onDialogMouseDown(dialogId)}
-          selected={selectedDialogId === dialogId}
+        return <Dialog 
+          key={dialogId}
+          id={dialogId}
+          name={dialog.name}
+          left={dialog.left}
+          top={dialog.top}
+          height={dialog.height}
+          width={dialog.width}
+          style={dialog.style}
+          onClose={() => {}}
+          onMaximize={() => {}}
+          onMinimize={() => {}}
           >{dialog.children}</Dialog>
       })}
       <div className="app-bottom-bar">
