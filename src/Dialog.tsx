@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useReducer, useCallback } from 'react';
+import React, { useState, useEffect, useReducer, useCallback, CSSProperties } from 'react';
 
 interface Property {
   id: string
   name: string
-  style: any
+  style: CSSProperties
   top: number
   left: number
   width: number
@@ -15,7 +15,69 @@ interface Property {
 
 let incrementIndex = 10;
 
-const reducer = (state: any, action: any) => {
+interface State {
+  x: number
+  y: number
+  top: number
+  left: number
+  width: number
+  height: number
+  zIndex: number
+  selected: boolean
+  max: boolean
+  icon: {
+    hover: boolean,
+  },
+  dragging: boolean
+}
+
+type Action = (
+  | ReturnType<typeof dragStart>
+  | ReturnType<typeof drag>
+  | ReturnType<typeof mouseup>
+  | ReturnType<typeof hover>
+  | ReturnType<typeof showTop>
+  | ReturnType<typeof maximize>
+)
+
+const dragStart = (x: number, y: number) => {
+  return {
+    type: 'drag_start' as const,
+    x,
+    y,
+  }
+}
+
+const drag = (x: number, y: number) => {
+  return {
+    type: 'drag' as const,
+    x,
+    y,
+  }
+}
+
+const mouseup = () => {
+  return {
+    type: 'mouseup' as const,
+  }
+}
+
+const hover = (hover: boolean) => {
+  return {
+    type: 'hover' as const,
+    hover,
+  }
+}
+
+const showTop = () => {
+  return {type: 'show_top' as const}
+}
+
+const maximize = () => {
+  return {type: 'maximize' as const}
+}
+
+const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'drag_start':
       return {
@@ -48,7 +110,7 @@ const reducer = (state: any, action: any) => {
       return {
         ...state,
         icon: {
-          hover: action.state,
+          hover: action.hover,
         },
       }
     case 'show_top':
@@ -69,7 +131,8 @@ const reducer = (state: any, action: any) => {
 
 const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, left, width, height, onClose, onMinimize}) => {
   const [state, dispatch] = useReducer(reducer, {
-    mouse: { x: 0, y: 0 },
+    x: 0,
+    y: 0,
     top,
     left,
     width,
@@ -80,38 +143,35 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
     icon: {
       hover: false,
     },
+    dragging: false,
   })
   useEffect(() => {
     const onmousemove = (e: MouseEvent) => {
-      dispatch({
-        type: 'drag',
-        x: e.clientX,
-        y: e.clientY,
-      })
+      dispatch(drag(e.clientX, e.clientY))
     }
     document.addEventListener('mousemove', onmousemove)
     return () => {
       document.removeEventListener('mousemove', onmousemove)
     }
   }, [])
-  const showTop = useCallback((e: React.MouseEvent) => {
-    dispatch({type: 'show_top'})
+  const onClick = useCallback((e: React.MouseEvent) => {
+    dispatch(showTop())
   }, []);
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch({type: 'drag_start', x: e.clientX, y: e.clientY})
+    dispatch(dragStart(e.clientX, e.clientY))
   }, [])
   const onMouseUp = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch({type: 'mouseup'})
+    dispatch(mouseup())
   }, [])
   const onMouseEnter = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch({type: 'hover', state: true})
+    dispatch(hover(true))
   }, [])
   const onMouseLeave = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch({type: 'hover', state: false})
+    dispatch(hover(false))
   }, [])
   const onDialogClose = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -119,7 +179,7 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
   }, [onClose])
   const onMaximize = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch({type: "maximize"});
+    dispatch(maximize());
   }, [])
   const onDialogMinimize = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -139,7 +199,7 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
         overflow: 'auto',
       }}
       className={'dialog' + (state.dragging ? ' dialog-selected' : '') + (hidden ? ' hidden' : '')}
-      onClick={showTop}
+      onClick={onClick}
       >
       <div className={'title-bar' + (state.icon.hover ? ' hover' : '')} onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
         <div className="icons" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>

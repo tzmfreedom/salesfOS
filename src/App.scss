@@ -23,12 +23,17 @@
   float: left;
 }
 
-.app-bar-icon {
+.app-bar-icons {
   float: right;
   height: 40px;
   line-height: 40px;
   font-size: 18px;
   color: white;
+}
+
+.app-bar-icon {
+  float: left;
+  margin-left: 10px;
 }
 
 .app-bar_time {

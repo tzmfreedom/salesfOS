@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useReducer, CSSProperties } from 'react';
 import Icon from './Icon';
 import Dialog from './Dialog';
 import AccountList from './AccountList';
@@ -10,32 +10,44 @@ import monitorImg from './img/monitor.png';
 import cryptographyImg from './img/cryptography.png';
 import penImg from './img/pen.png';
 import trashImg from './img/trash.png';
+import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWifi, faVolumeUp, faBatteryThreeQuarters, faCloud } from '@fortawesome/free-solid-svg-icons'
 
 const jsforce = require('jsforce');
-
-let incrementalIndex = 10;
-let connection: any;
 
 interface IconProperty {
   img: any
   name: string
   left: number
   top: number
-  style: any
+  style: CSSProperties
   selected: boolean
   type: 'link' | 'window'
   link?: string
-  body?: () => JSX.Element
+  body?: (connection: any) => JSX.Element
 }
 
-interface IconConfig {
-  icons: {[a: string]: IconProperty}
-  dialogs: any,
-  draggedIconId: string
-  draggedDialogId: string
+interface DialogProperty {
+  id: string
+  name: string
+  left: number
+  top: number
+  width: number
+  height: number
+  style: React.CSSProperties
+  children: JSX.Element
+  hidden: boolean
+}
+
+interface State {
+  icons: {[key: string]: IconProperty}
+  dialogs: {[key: string]: DialogProperty},
   mouse: {x: number, y: number}
+  incrementalIndex: number
+  connection: any
+  date: string
+  time: string
 }
 
 const defaultIcons: {[s: string]: IconProperty} = {
@@ -48,7 +60,7 @@ const defaultIcons: {[s: string]: IconProperty} = {
     },
     selected: true,
     type: 'window',
-    body: () => <AccountList connection={connection} />
+    body: (connection) => <AccountList connection={connection} />
   },
   game: {
     img: gameImg,
@@ -81,7 +93,7 @@ const defaultIcons: {[s: string]: IconProperty} = {
     },
     selected: false,
     type: 'window',
-    body: () => <SObjectList connection={connection} />
+    body: (connection) => <SObjectList connection={connection} />
   },
   pen: {
     img: penImg,
@@ -104,23 +116,136 @@ const defaultIcons: {[s: string]: IconProperty} = {
     },
     selected: false,
     type: 'window',
-    body: () => <AccountList connection={connection}/>
+    body: (connection) => <AccountList connection={connection}/>
   },
 };
 
-const appStart = () => jsforce.browser.login();
+const deleteDialog = (dialogId: string) => {
+  return {
+    type: 'delete_dialog' as const,
+    dialogId,
+  }
+}
+
+const connect = (connection: any) => {
+  return {
+    type: 'connect' as const,
+    connection,
+  }
+}
+
+const minimize = (dialogId: string) => {
+  return {
+    type: 'minimize' as const,
+    dialogId,
+  }
+}
+
+const activateWindow = (dialogId: string) => {
+  return {
+    type: 'activate_window' as const,
+    dialogId,
+  }
+}
+
+const addWindow = (icon: IconProperty) => {
+  return {
+    type: 'add_window' as const,
+    icon,
+  }
+}
+
+const setTime = (date: string, time: string) => {
+  return {
+    type: 'set_time' as const,
+    date,
+    time,
+  }
+}
+
+type Action = (
+  | ReturnType<typeof deleteDialog>
+  | ReturnType<typeof connect>
+  | ReturnType<typeof minimize>
+  | ReturnType<typeof activateWindow>
+  | ReturnType<typeof addWindow>
+  | ReturnType<typeof setTime>
+);
+
+const reducer = (state: State, action: Action): State => {
+  switch(action.type) {
+    case 'delete_dialog': {
+      const dialogs = state.dialogs;
+      delete dialogs[action.dialogId]
+      return {
+        ...state,
+        dialogs,
+      }
+    }
+    case 'connect':
+      return {
+        ...state,
+        connection: action.connection,
+      }
+    case 'minimize': {
+      const dialogs = state.dialogs;
+      dialogs[action.dialogId].hidden = true;
+      return {
+        ...state,
+        dialogs
+      }
+    }
+    case 'activate_window': {
+      const dialogs = state.dialogs
+      dialogs[action.dialogId].hidden = false;
+      return {
+        ...state,
+        dialogs,
+      }
+    }
+    case 'add_window':
+      state.incrementalIndex++
+      const index = state.incrementalIndex
+      return {
+        ...state,
+        dialogs: {
+          ...state.dialogs,
+          [index]: {
+            id: index,
+            name: action.icon.name,
+            left: index * 10,
+            top: index * 10,
+            width: 800,
+            height: 300,
+            style: {
+              backgroundColor: 'white',
+            },
+            children: action.icon.body!(state.connection),
+          }
+        }
+      }
+    case 'set_time':
+      return {
+        ...state,
+        date: action.date,
+        time: action.time,
+      }
+    default:
+      console.error(action)
+      throw new Error();
+  }
+}
 
 const App: React.FC = () => {
-  const [iconConfig, setIconConfig] = useState({
+  const [state, dispatch]= useReducer(reducer, {
     icons: defaultIcons,
-    dialogs: {} as any,
-    draggedIconId: '',
-    draggedDialogId: '',
-    mouse: {
-      x: 0,
-      y: 0,
-    }
-  } as IconConfig)
+    dialogs: {},
+    connection: null,
+    mouse: {x: 0, y: 0},
+    incrementalIndex: 10,
+    date: moment().format('YYYY-MM-DD'),
+    time: moment().format('HH:mm'),
+  });
 
   const isOnTrash = useCallback((trash: IconProperty, e: MouseEvent) => {
     return e.clientX >= trash.left &&
@@ -130,86 +255,51 @@ const App: React.FC = () => {
   }, [])
 
   useEffect(() => {
+    const intervalId = setInterval(function () {
+      const date = moment().format('YYYY-MM-DD');
+      const time = moment().format('HH:mm');
+      dispatch({type: "set_time", date, time})
+    }, 1000);
+
     jsforce.browser.init({
       clientId: process.env.client_id,
       redirectUri: process.env.redirect_uri,
       proxyUrl: process.env.proxy_url,
     });
 
-    jsforce.browser.on('connect', function(conn: any) {
-      connection = conn
-    })
+    jsforce.browser.on('connect', function(connection: any) {
+      dispatch({type: 'connect', connection})
+    });
+    return () => clearInterval(intervalId)
   }, [])
 
   const onClose = useCallback((dialogId: string) => {
-    const dialogs = iconConfig.dialogs;
-    delete dialogs[dialogId]
-    setIconConfig(prevState => {
-      return {...prevState, dialogs}
-    })
-  }, [iconConfig.dialogs])
+    dispatch({type: 'delete_dialog', dialogId})
+  }, [])
   
   const onMinimize = useCallback((dialogId: string) => {
-    const dialogs = iconConfig.dialogs;
-    dialogs[dialogId].hidden = true;
-    setIconConfig(prevState => {
-      return {...prevState, dialogs}
-    })
-  }, [iconConfig.dialogs])
+    dispatch({type: 'minimize', dialogId})
+  }, [])
+
+  const appStart = useCallback(() => jsforce.browser.login(), []);
 
   const doubleClick = useCallback((icon) => {
-    if (icon.name === 'ゴミ箱') {
-      setIconConfig((prevState: IconConfig) => {
-        Object.keys(prevState.dialogs).forEach(key => {
-          prevState.dialogs[key].hidden = false;
-        })
-        console.log({...prevState, dialogs: prevState.dialogs})
-        return {...prevState, dialogs: prevState.dialogs}
-      })
-      return;
-    }
     switch (icon.type) {
       case 'link':
         window.open(icon.link, '_blank')
         break;
       case 'window':
       default:
-        setIconConfig((prevState: IconConfig) => {
-          incrementalIndex++
-          console.log(incrementalIndex);
-          const dialogs = {
-            ...prevState.dialogs,
-            [incrementalIndex]: {
-              id: incrementalIndex,
-              name: icon.name,
-              left: incrementalIndex * 10,
-              top: incrementalIndex * 10,
-              width: '800px',
-              height: '300px',
-              style: {
-                backgroundColor: 'white',
-              },
-              children: icon.body(),
-            }
-          }
-          return { ...prevState, dialogs: dialogs }
-        })
+        dispatch({type: 'add_window', icon});
         break;
     }
   }, [])
   const activateWindow = useCallback((dialogId: string) => {
     return (e: React.MouseEvent) => {
-      setIconConfig(prevState => {
-        const dialog = prevState.dialogs[dialogId];
-        dialog.hidden = false;
-        return {
-          ...prevState,
-          dialogs: prevState.dialogs,
-        }
-      })
+      dispatch({type: 'activate_window', dialogId});
     }
   }, []);
-  const { icons, dialogs } = iconConfig
+  const { icons, dialogs } = state
   return (
     <div className="App">
       {Object.keys(icons).map((iconId) => {
@@ -266,15 +356,21 @@ const App: React.FC = () => {
             >{dialog.name}</div>
           })}
         </div>
-        <div className="app-bar-icon">
+        <div className="app-bar-icons">
           <div style={{float: "left"}}>
-            <FontAwesomeIcon icon={faWifi} />
-            <FontAwesomeIcon icon={faVolumeUp} />
-            <FontAwesomeIcon icon={faBatteryThreeQuarters} />
+            <div className="app-bar-icon">
+              <FontAwesomeIcon icon={faWifi} />
+            </div>
+            <div className="app-bar-icon">
+              <FontAwesomeIcon icon={faVolumeUp} />
+            </div>
+            <div className="app-bar-icon">
+              <FontAwesomeIcon icon={faBatteryThreeQuarters} />
+            </div>
           </div>
           <div className="app-bar_time">
-            <div className="date"></div>
-            <div className="time"></div>
+            <div className="date">{state.date}</div>
+            <div className="time">{state.time}</div>
           </div>
         </div>
       </div>

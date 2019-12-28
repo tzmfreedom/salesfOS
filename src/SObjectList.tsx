@@ -10,18 +10,24 @@ interface SObjectListProperty {
 const SObjectList: React.FC<SObjectListProperty> = ({ children, connection }) => {
   const [sObjects, setSObjects] = useState([]);
   const [fields, setFields] = useState(['label', 'name'])
+  const [isRequiredConnection, setIsRequiredConnection] = useState(false)
   
   useEffect(() => {
-    connection.describeGlobal((err: any, res: any) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      setSObjects(res.sobjects.filter((r: any) => r.custom));
-    });
-  }, [])
+    if (connection) {
+      connection.describeGlobal((err: any, res: any) => {
+        if (err) { console.error(err); return; }
+        setSObjects(res.sobjects.filter((r: any) => r.custom));
+      });
+    } else {
+      setIsRequiredConnection(true);
+    }
+  }, [connection])
   return (
+    (isRequiredConnection ? (
+      <div>認証が必要です</div>
+    ) : (
     <Table records={sObjects} fields={fields} />
+    ))
   );
 }
 
