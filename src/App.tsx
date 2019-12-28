@@ -2,7 +2,9 @@ import React, { useCallback, useEffect, useReducer, CSSProperties } from 'react'
 import Icon from './Icon';
 import Dialog from './Dialog';
 import AccountList from './AccountList';
+import AccountTree from './AccountTree';
 import SObjectList from './SObjectList';
+import Folder from './Folder';
 import './App.scss';
 import folderImg from './img/folder.png';
 import gameImg from './img/game.png';
@@ -51,7 +53,53 @@ interface State {
 }
 
 const defaultIcons: {[s: string]: IconProperty} = {
+  accountTree: {
+    img: folderImg,
+    name: 'AccountTree',
+    left: 20,
+    top: 580,
+    style: {
+    },
+    selected: true,
+    type: 'window',
+    body: (connection) => <AccountTree connection={connection}/>
+  },
   folder: {
+    img: folderImg,
+    name: '取引先一覧',
+    left: 20,
+    top: 500,
+    style: {
+    },
+    selected: true,
+    type: 'window',
+    body: (_) => <Folder name="hoge" show={true} files={[
+      {type: "File", name: "foo1"},
+      {type: "File", name: "foo2"},
+      {type: "File", name: "foo3"},
+      {type: "File", name: "foo4"},
+      {
+        type: "Directory",
+        name: "dir1",
+        show: false,
+        files: [
+          { type: "File", name: "foo5" },
+          { type: "File", name: "foo6" },
+          {
+            type: "Directory",
+            name: "dir1",
+            show: false,
+            files: [
+              { type: "File", name: "foo8" },
+              { type: "File", name: "foo9" },
+            ],
+          },
+          { type: "File", name: "foo7" },
+        ]
+      },
+    ]}/>
+  },
+  account: {
     img: folderImg,
     name: '取引先一覧',
     left: 20,

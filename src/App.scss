@@ -61,10 +61,36 @@ body {
   border: dotted white 1px;
 }
 
+.account {
+  position: absolute;
+}
+
+.accountTree {
+  position: absolute;
+}
+
+.folder-title {
+  cursor: default;
+}
+
+.folder-name, .file-name {
+  margin-right: 5px;
+}
+
+.folder-block {
+  ul {
+    padding-left: 0;
+    margin-top: 0;
+  }
+  li {
+    cursor: default;
+    list-style: none;
+    margin-left: 20px;
+  }
+}
+
 .folder {
   position: absolute;
-  width: 66px;
-  height: 66px;
 }
 
 .game {
