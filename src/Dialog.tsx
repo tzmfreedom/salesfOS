@@ -35,29 +35,15 @@ const reducer = (state: any, action: any) => {
           left: state.left + action.x - state.x,
         }
       }
-      if (state.resizing) {
+      return state;
+    case 'mouseup':
+      if (state.dragging) {
         return {
           ...state,
-          width: action.x - state.left,
-          height: action.y - state.top,
+          dragging: false,
         }
       }
       return state;
-    case 'resize_start':
-      return {
-        ...state,
-        x: action.x,
-        y: action.y,
-        resizing: true,
-        zIndex: incrementIndex++
-      }
-    case 'mouseup':
-      if (!state.dragging && !state.resizing) return state;
-      return {
-        ...state,
-        dragging: false,
-        resizing: false,
-      }
     case 'hover':
       return {
         ...state,
@@ -97,7 +83,6 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
   })
   useEffect(() => {
     const onmousemove = (e: MouseEvent) => {
-      e.preventDefault();
       dispatch({
         type: 'drag',
         x: e.clientX,
@@ -116,25 +101,28 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
     e.preventDefault();
     dispatch({type: 'drag_start', x: e.clientX, y: e.clientY})
   }, [])
-  const onResizeMouseDown = useCallback((e: React.MouseEvent) => {
-    dispatch({type: 'resize_start', x: e.clientX, y: e.clientY})
-  }, [])
   const onMouseUp = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
     dispatch({type: 'mouseup'})
   }, [])
   const onMouseEnter = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
     dispatch({type: 'hover', state: true})
   }, [])
   const onMouseLeave = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
     dispatch({type: 'hover', state: false})
   }, [])
   const onDialogClose = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
     onClose(id);
   }, [onClose])
   const onMaximize = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
     dispatch({type: "maximize"});
   }, [])
   const onDialogMinimize = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
     onMinimize(id)
   }, [onMinimize])
   return (
@@ -147,6 +135,8 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
         width: state.max ? '100%' : state.width,
         height: state.max ? '100%' : state.height,
         zIndex: state.zIndex,
+        resize: 'both',
+        overflow: 'auto',
       }}
       className={'dialog' + (state.dragging ? ' dialog-selected' : '') + (hidden ? ' hidden' : '')}
       onClick={showTop}
@@ -162,7 +152,6 @@ const Dialog: React.FC<Property> = ({ children, style, id, hidden, name, top, le
       <div className="dialog-content">
       {children}
       </div>
-      <div onMouseDown={onResizeMouseDown} onMouseUp={onMouseUp} style={{cursor: 'nwse-resize', position: "absolute", bottom: 0, right: 0}}>//</div>
     </div>
   );
 }

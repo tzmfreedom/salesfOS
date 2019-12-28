@@ -52,7 +52,6 @@ const Icon: React.FC<IconProperty> = ({ style, id, name, top, left, img, onDoubl
 
   useEffect(() => {
     const onmousemove = (e: MouseEvent) => {
-      e.preventDefault();
       dispatch({
         type: 'drag_dialog',
         x: e.clientX,
@@ -76,11 +75,14 @@ const Icon: React.FC<IconProperty> = ({ style, id, name, top, left, img, onDoubl
     <div id={id} 
       style={{...style, left: state.left, top: state.top}}
       className={'app-icon ' + id + (state.selected ? ' app-icon-clicked' : '')}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-      onDoubleClick={onDoubleClick}>
+      >
       <div className="relative">
-        <img data-icon-id={id} src={img} />
+        <img 
+          onDoubleClick={onDoubleClick}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
+          data-icon-id={id}
+          src={img} />
         <span className="app-icon-name">{name}</span>
       </div>
     </div>
