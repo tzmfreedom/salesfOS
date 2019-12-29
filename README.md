@@ -13,9 +13,9 @@ $ npm i -D \
 
 ## TODO
 
-* [ ] Markdown Editor
-* [ ] Calendar
+* [x] Calendar
+* [x] Terminal
+* [x] Calculator
+* [x] Markdown Editor
 * [ ] Text Editor
-* [ ] Terminal
 * [ ] Original Programing Language
-* [ ] Calculator

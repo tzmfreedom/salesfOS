@@ -6,6 +6,7 @@ import AccountTree from './AccountTree';
 import SObjectList from './SObjectList';
 import Folder from './Folder';
 import Console from './Console';
+import Calendar from './Calendar';
 import './App.scss';
 import folderImg from './img/folder.png';
 import gameImg from './img/game.png';
@@ -13,10 +14,15 @@ import monitorImg from './img/monitor.png';
 import cryptographyImg from './img/cryptography.png';
 import penImg from './img/pen.png';
 import trashImg from './img/trash.png';
+import calendarImg from './img/calendar-icon.png';
+import calculatorImg from './img/calculator.png';
+import editorImg from './img/editor.svg';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWifi, faVolumeUp, faBatteryThreeQuarters, faCloud } from '@fortawesome/free-solid-svg-icons'
 import terminalIcon from './img/terminal.svg'
+import Calculator from './Calculator';
+import Markdown from './Markdown';
 
 const jsforce = require('jsforce');
 
@@ -28,6 +34,7 @@ interface IconProperty {
   style: CSSProperties
   selected: boolean
   type: 'link' | 'window'
+  dialog?: {width: number, height: number}
   link?: string
   body?: (connection: any) => JSX.Element
 }
@@ -58,7 +65,7 @@ const defaultIcons: {[s: string]: IconProperty} = {
   console: {
     img: terminalIcon,
     name: 'コンソール',
-    left: 100,
+    left: 120,
     top: 20,
     style: {
     },
@@ -66,51 +73,57 @@ const defaultIcons: {[s: string]: IconProperty} = {
     type: 'window',
     body: (_) => <Console />
   },
-  accountTree: {
-    img: folderImg,
-    name: 'AccountTree',
-    left: 20,
-    top: 580,
+  calendar: {
+    img: calendarImg,
+    name: 'カレンダー',
+    left: 120,
+    top: 100,
+    style: {
+    },
+    dialog: {
+      width: 300,
+      height: 340,
+    },
+    selected: true,
+    type: 'window',
+    body: (connection) => <Calendar year={2019} month={12}/>
+  },
+  calculator: {
+    img: calculatorImg,
+    name: '計算機',
+    left: 120,
+    top: 180,
+    style: {
+    },
+    dialog: {
+      width: 300,
+      height: 340,
+    },
+    selected: true,
+    type: 'window',
+    body: (connection) => <Calculator />
+  },
+  markdownEditor: {
+    img: editorImg,
+    name: 'マークダウンエディタ',
+    left: 120,
+    top: 260,
     style: {
     },
     selected: true,
     type: 'window',
-    body: (connection) => <AccountTree connection={connection}/>
+    body: (connection) => <Markdown />
   },
-  folder: {
+  accountTree: {
     img: folderImg,
-    name: '取引先一覧',
+    name: 'AccountTree',
     left: 20,
     top: 500,
     style: {
     },
     selected: true,
     type: 'window',
-    body: (_) => <Folder name="hoge" show={true} files={[
-      {type: "File", name: "foo1"},
-      {type: "File", name: "foo2"},
-      {type: "File", name: "foo3"},
-      {type: "File", name: "foo4"},
-      {
-        type: "Directory",
-        name: "dir1",
-        show: false,
-        files: [
-          { type: "File", name: "foo5" },
-          { type: "File", name: "foo6" },
-          {
-            type: "Directory",
-            name: "dir1",
-            show: false,
-            files: [
-              { type: "File", name: "foo8" },
-              { type: "File", name: "foo9" },
-            ],
-          },
-          { type: "File", name: "foo7" },
-        ]
-      },
-    ]}/>
+    body: (connection) => <AccountTree connection={connection}/>
   },
   account: {
     img: folderImg,
@@ -276,8 +289,8 @@ const reducer = (state: State, action: Action): State => {
             name: action.icon.name,
             left: index * 10,
             top: index * 10,
-            width: 800,
-            height: 300,
+            width: action.icon.dialog ? action.icon.dialog.width : '800px',
+            height: action.icon.dialog ? action.icon.dialog.height : '300px',
             style: {
               backgroundColor: 'white',
             },

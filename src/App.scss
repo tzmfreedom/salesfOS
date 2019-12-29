@@ -174,7 +174,7 @@ table.flex-table tr th {
 
 .title {
   text-align: center;
-  margin-left: 300px;
+  margin-left: 80px;
   display: inline-block;
 }
 
@@ -269,4 +269,8 @@ table.flex-table tr th {
 .dialog-max {
   @include dialog-title-button();
   background-color: yellowgreen;
+}
+
+.markdown-block {
+  height: 100%;
 }
