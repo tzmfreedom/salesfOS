@@ -61,12 +61,21 @@ body {
   border: dotted white 1px;
 }
 
-.account {
-  position: absolute;
-}
-
-.accountTree {
-  position: absolute;
+.console-block {
+  background-color: black;
+  height: calc(100% + 20px);
+  color: white;
+  margin: -10px;
+  input {
+    font-size: 1em;
+    background-color: transparent;
+    border: 0;
+    color: white;
+  }
+  input:focus {
+    outline: none;
+    outline-offset: 0;
+  }
 }
 
 .folder-title {
@@ -89,30 +98,6 @@ body {
   }
 }
 
-.folder {
-  position: absolute;
-}
-
-.game {
-  position: absolute;
-}
-
-.monitor {
-  position: absolute;
-}
-
-.cryptography {
-  position: absolute;
-}
-
-.pen {
-  position: absolute;
-}
-
-.trash {
-  position: absolute;
-}
-
 img {
   width: 60px;
   height: 60px;
@@ -120,6 +105,10 @@ img {
 
 .table {
   font-size: 12px;
+}
+
+.app-icon {
+  position: absolute;
 }
 
 .app-icon-name {

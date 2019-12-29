@@ -10,3 +10,12 @@ $ npm i -D \
   react-fontawesome @fortawesome/free-solid-svg-icons \
   @types/{react,react-dom,node}
 ```
+
+## TODO
+
+* [ ] Markdown Editor
+* [ ] Calendar
+* [ ] Text Editor
+* [ ] Terminal
+* [ ] Original Programing Language
+* [ ] Calculator

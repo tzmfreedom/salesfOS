@@ -53,7 +53,14 @@ module.exports = env => {
           use: {
             loader: "url-loader"
           }
-        }
+        },
+        {
+          test: /\.svg$/,
+          use: {
+            loader: "svg-url-loader",
+            options: {},
+          },
+        },
       ]
     },
     plugins: [

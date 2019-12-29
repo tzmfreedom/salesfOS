@@ -107,7 +107,7 @@ const Icon: React.FC<IconProperty> = ({ style, id, name, top, left, img, onDoubl
   return (
     <div id={id} 
       style={{...style, left: state.left, top: state.top}}
-      className={'app-icon ' + id + (state.selected ? ' app-icon-clicked' : '')}
+      className={'app-icon ' + (state.selected ? ' app-icon-clicked' : '')}
       >
       <div className="relative">
         <img 

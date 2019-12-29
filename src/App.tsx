@@ -5,6 +5,7 @@ import AccountList from './AccountList';
 import AccountTree from './AccountTree';
 import SObjectList from './SObjectList';
 import Folder from './Folder';
+import Console from './Console';
 import './App.scss';
 import folderImg from './img/folder.png';
 import gameImg from './img/game.png';
@@ -15,6 +16,7 @@ import trashImg from './img/trash.png';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWifi, faVolumeUp, faBatteryThreeQuarters, faCloud } from '@fortawesome/free-solid-svg-icons'
+import terminalIcon from './img/terminal.svg'
 
 const jsforce = require('jsforce');
 
@@ -53,6 +55,17 @@ interface State {
 }
 
 const defaultIcons: {[s: string]: IconProperty} = {
+  console: {
+    img: terminalIcon,
+    name: 'コンソール',
+    left: 100,
+    top: 20,
+    style: {
+    },
+    selected: true,
+    type: 'window',
+    body: (_) => <Console />
+  },
   accountTree: {
     img: folderImg,
     name: 'AccountTree',
