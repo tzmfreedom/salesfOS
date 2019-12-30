@@ -23,6 +23,7 @@ import { faWifi, faVolumeUp, faBatteryThreeQuarters, faCloud } from '@fortawesom
 import terminalIcon from './img/terminal.svg'
 import Calculator from './Calculator';
 import Markdown from './Markdown';
+import Excel from './Excel';
 
 const jsforce = require('jsforce');
 
@@ -124,6 +125,17 @@ const defaultIcons: {[s: string]: IconProperty} = {
     selected: true,
     type: 'window',
     body: (connection) => <AccountTree connection={connection}/>
+  },
+  excel: {
+    img: folderImg,
+    name: 'Excel',
+    left: 120,
+    top: 340,
+    style: {
+    },
+    selected: true,
+    type: 'window',
+    body: (connection) => <Excel />
   },
   account: {
     img: folderImg,

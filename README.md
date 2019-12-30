@@ -19,3 +19,4 @@ $ npm i -D \
 * [x] Markdown Editor
 * [ ] Text Editor
 * [ ] Original Programing Language
+* [ ] replace key index to unique key
